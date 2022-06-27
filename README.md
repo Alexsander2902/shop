@@ -1,4 +1,4 @@
-# Sistema Credihabitar
+# Sistema Shop
 
 ## Este sistema possúi:
 
@@ -74,15 +74,6 @@ pylint app
 flake8 app
 pytest --cov=app .
 pytest --cov=. app/
-```
-
-## Considerações para acesso ao servidor do sistema
-
-```shell
-ssh -i 'credihabitar-crm.ppk' credihabitar@34.132.227.125
-# Digite a senha...
-sudo -s
-cd /home/credihabitar/crm_backend
 ```
 
 ## Comentários
