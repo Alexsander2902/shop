@@ -1,0 +1,28 @@
+# Logs
+*.log
+# Cache files
+__pycache__/
+.mypy_cache
+.pytest_cache
+.coverage
+__init__.pyc
+app.pyc
+.mutmut-cache
+backend_python/uploads/*
+# Environment
+env/
+.idea/
+# Critical information
+/backend_python/app/models/database.json
+/backend_python/app/controllers/key.json
+/backend_python/app/controllers/encryption.json
+/backend_python/utils/gmail.json
+fontes/
+keys/
+# Libraries
+/frontend_react/app/node_modules
+/frontend_react/app/package-lock.json
+/frontend_react/app/package.json
+docker-compose.yml
+scripts/
+backup/

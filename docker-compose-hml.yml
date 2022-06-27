@@ -1,0 +1,42 @@
+version: '3.3'
+
+volumes:
+  webapp-log:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/credihabitar/logs/webapp/log/
+
+services:
+  webapp:
+    build:
+      context: ./backend_python
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "20001:80"
+    volumes:
+      - webapp-log:/python/logs
+  crm_react:
+    build:
+      context: ./frontend_react
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "3000:3000"  
+  nginx:
+    build:
+      context: ./nginx
+    ports:
+      - "20003:80"
+  santander_process_sync:
+    build:
+      context: ./scheduler/santander_process_sync
+      dockerfile: Dockerfile
+    restart: always
+  bradesco_process_sync:
+    build:
+      context: ./scheduler/bradesco_process_sync
+      dockerfile: Dockerfile
+    restart: always
