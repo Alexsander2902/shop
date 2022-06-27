@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "9759598b-f051-4588-a241-4559bcfd0126",
+		"_postman_id": "aaceffea-11eb-47de-ad28-8cb734b91e60",
 		"name": "Teste local shop",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -18,12 +18,12 @@
 					},
 					{
 						"key": "Key",
-						"value": "10e3c1f780284e8b9fc621f249398f20",
+						"value": "2dbb01bc0adb472b9736ba6830df4256",
 						"type": "text"
 					},
 					{
 						"key": "User_Id",
-						"value": "D09BA036-C034-45A2-9DE2-C5E941A73366",
+						"value": "94A74CF8-3B1D-49A3-A795-C9819221B524",
 						"type": "text"
 					},
 					{
@@ -81,12 +81,12 @@
 					},
 					{
 						"key": "Key",
-						"value": "10e3c1f780284e8b9fc621f249398f20",
+						"value": "2dbb01bc0adb472b9736ba6830df4256",
 						"type": "text"
 					},
 					{
 						"key": "User_Id",
-						"value": "D09BA036-C034-45A2-9DE2-C5E941A73366",
+						"value": "94A74CF8-3B1D-49A3-A795-C9819221B524",
 						"type": "text"
 					},
 					{
@@ -147,12 +147,12 @@
 					},
 					{
 						"key": "Key",
-						"value": "10e3c1f780284e8b9fc621f249398f20",
+						"value": "2dbb01bc0adb472b9736ba6830df4256",
 						"type": "text"
 					},
 					{
 						"key": "User_Id",
-						"value": "D09BA036-C034-45A2-9DE2-C5E941A73366",
+						"value": "94A74CF8-3B1D-49A3-A795-C9819221B524",
 						"type": "text"
 					},
 					{
