@@ -1,6 +1,6 @@
-# Sistema Credihabitar
+# Sistema Shop
 
-## Este sistema possúi:
+## Este sistema possui:
 
 * API REST em Python 3
 * Testes Unitários e Funcionais com pytest
@@ -35,7 +35,7 @@ cd dir
 # Instalação das biliotecas 
 # (Há inconsistências entre plataformas)
 pip install -r requirements.txt
-#if Windows, install mysql-connector-python==8.0.26
+#if Windows, install mysql-connector-python
 # Executar projeto
 python main.py
 ```
@@ -74,15 +74,6 @@ pylint app
 flake8 app
 pytest --cov=app .
 pytest --cov=. app/
-```
-
-## Considerações para acesso ao servidor do sistema
-
-```shell
-ssh -i 'credihabitar-crm.ppk' credihabitar@34.132.227.125
-# Digite a senha...
-sudo -s
-cd /home/credihabitar/crm_backend
 ```
 
 ## Comentários
