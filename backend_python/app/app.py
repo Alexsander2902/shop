@@ -7,7 +7,9 @@ import flask.json as fj
 from app.controllers.human_resources import endpoint_users_get
 from app.controllers.human_resources import endpoint_users_post
 from app.controllers.human_resources import endpoint_users_patch
-
+from app.controllers.human_resources import endpoint_genders_get
+from app.controllers.human_resources import endpoint_genders_post
+from app.controllers.human_resources import endpoint_genders_patch
 
 
 
@@ -37,6 +39,9 @@ def run_app():
     app.add_url_rule("/users", methods=['GET'],   view_func=endpoint_users_get)
     app.add_url_rule("/users", methods=['POST'],  view_func=endpoint_users_post)
     app.add_url_rule("/users", methods=['PATCH'], view_func=endpoint_users_patch)
+    app.add_url_rule("/genders", methods=['GET'],   view_func=endpoint_genders_get)
+    app.add_url_rule("/genders", methods=['POST'],  view_func=endpoint_genders_post)
+    app.add_url_rule("/genders", methods=['PATCH'], view_func=endpoint_genders_patch)
 
 
 
