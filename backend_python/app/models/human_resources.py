@@ -23,7 +23,6 @@ def execute_query_genders_get(query={}, credentials={}):
             where = ' where gender.excluded=0'
             order = ' order by gender.added_on desc'
             limit = ''
-            group = ''
 
             if query["id"]:
                 where += " and gender.id=%(id)s"
@@ -46,28 +45,31 @@ def execute_query_genders_get(query={}, credentials={}):
                     "LEFT JOIN individual ON individual.gender_id_fk = gender.id " \
                     "LEFT JOIN staff ON staff.individual_id_fk = individual.id"
 
-            content += where + group + order + limit 
+            content += where + order + limit
             
             query1 = execute_query_connection(cur=cur,content=content,query=query)
             if query1['status']:
                 temp_response = query1['content']
                 if temp_response:
-                    keys = ("id","name","order","active","excluded","added_on") # genders 6 (6)
-                    keys_custom_data_1 = ("id","name","order","active","added_on") # gender 5
 
                     for item in temp_response:
                         temp_dict_response = {}
-                        temp_dict_response['gender'] = {keys[i]:item[i] for i in range(6)}
 
-                        if query["response_type"] == 'custom_data_1':
-                            temp_dict_response['gender'] = {keys_custom_data_1[i]:item[i] for i in range(5)}
+                        if query["response_type"] == 'table_data':
+                            temp_dict_response['gender'] = {}
+                            temp_dict_response['gender']['id'] = item[0]
+                            temp_dict_response['gender']['name'] = item[1]
+                            temp_dict_response['gender']['order'] = item[2]
+                            temp_dict_response['gender']['active'] = item[3]
+                            temp_dict_response['gender']['excluded'] = item[4]
+                            temp_dict_response['gender']['added_on'] = item[5]
 
                         execute_query_response['content'].append(temp_dict_response)
 
                 execute_query_response['status'] = True
             else:
                 execute_query_response['content'] = query1['content']
-            
+
             cur.close()
             conn.close()
         else:
@@ -180,7 +182,7 @@ def execute_query_users_get(query={}, credentials={}):
 
             if query["limit"]:
                 limit = " limit " + query["limit"]
-            
+
             if query["response_type"] == 'table_data':
                 content ="SELECT user.id, user.individual_id_fk, user.alias, user.login, user.password, user.pagination, user.active, user.admin, user.excluded, user.added_on FROM user "
 
@@ -189,36 +191,39 @@ def execute_query_users_get(query={}, credentials={}):
                     "FROM user " \
                     "INNER JOIN individual " \
                     "ON individual.id = user.individual_id_fk "
-            
+
             if not query["response_type"]:
                 content = "SELECT user.id, user.individual_id_fk, user.alias, user.login, user.password, user.pagination, user.active, user.admin, user.excluded, user.added_on FROM user " 
-            
+
             content += where + order + limit    
 
             query1 = execute_query_connection(cur=cur,content=content,query=query)
             if query1['status']:
                 temp_response = query1['content']
                 if temp_response:
-                    keys = ('id','individual_id_fk','alias','login','password','pagination','active','admin','excluded','added_on') # user 10 (10)
-                    keys_custom_data_1 = ('id','individual_id_fk','alias','login','password','pagination','active','admin','excluded','added_on', # user 10 (10)
-                        'id','name') #indiviudual 2 (10,12)
 
                     for item in temp_response:
                         temp_dict_response = {}
 
                         if query["response_type"] == 'table_data': 
-                            temp_dict_response['user'] = {keys[i]:item[i] for i in range(10)}
+                            temp_dict_response['user'] = {}
+                            temp_dict_response['user']['id'] = item[0]
+                            temp_dict_response['user']['individual_id_fk'] = item[1]
+                            temp_dict_response['user']['alias'] = item[2]
+                            temp_dict_response['user']['login'] = item[3]
+                            temp_dict_response['user']['password'] = item[4]
+                            temp_dict_response['user']['pagination'] = item[5]
+                            temp_dict_response['user']['active'] = item[6]
+                            temp_dict_response['user']['admin'] = item[7]
+                            temp_dict_response['user']['excluded'] = item[8]
+                            temp_dict_response['user']['added_on'] = item[9]
 
-                        if query["response_type"] == 'custom_data_1':
-                            temp_dict_response['user'] = {keys_custom_data_1[i]:item[i] for i in range(10)}
-                            temp_dict_response['user']['individual'] = {keys_custom_data_1[i]:item[i] for i in range(10,12)}
-                        
                         execute_query_response['content'].append(temp_dict_response)
-                        
+
                 execute_query_response['status'] = True
             else:
                 execute_query_response['content'] = query1['content']
-            
+
             cur.close()
             conn.close()
         else:
