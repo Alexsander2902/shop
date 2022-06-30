@@ -5,8 +5,6 @@ import mysql.connector
 from app.models import get_connection
 from app.models import execute_query_connection
 
-import uuid
-
 def execute_query_activity_log_post(query={}, credentials={}):
     """ doctest for execute_query_activity_log_post (pendent try exception global of function) without unit test
     """
