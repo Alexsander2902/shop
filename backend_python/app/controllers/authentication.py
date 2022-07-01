@@ -32,7 +32,8 @@ from app.utils.util import formatter_datetime
 # Controllers
 from app.controllers import key
 from app.controllers import check_session
-from app.controllers import insert_activity_log
+from app.controllers.logs import insert_activity_log
+from app.controllers.logs import create_log
 
 def endpoint_authentication_post():
     """ doctest for endpoint_authentication_post (pendent try exception global of function) without unit test
@@ -181,29 +182,12 @@ def endpoint_user_auto_login_get():
                                     execute_query_response = execute_query_user_auto_login_get(query=query, credentials=credentials)
                                     if execute_query_response['status']:
                                         if (len(execute_query_response['content']) == 1):
+                                            
                                             data = execute_query_response3['content'][0]
                                             data['user_auto_login'] = execute_query_response['content'][0]['user_auto_login']
-                                            log = {}
-                                            log['activity_log'] = {}
-                                            log['activity_log']['id'] = str(uuid.uuid4()).upper()
-                                            if 'User-Id' in headers:
-                                                log['activity_log']['user_id_fk'] = headers['User-Id'] #*
-                                            if 'Channel_Contact_Id' in headers:
-                                                log['activity_log']['channel_contact_id_fk'] = headers['Channel-Contact-Id'] #*
-                                            log['activity_log']['rel_id'] = query['user_id_fk']
-                                            log['activity_log']['section'] = headers['Section']
-                                            log['activity_log']['description'] = headers['Description']
-                                            log['activity_log']['description_complement'] = headers['Description-Complement']
-                                            log['activity_log']['complementary_information'] = headers['Complementary-Information']
-                                            log['activity_log']['model'] = ''
-                                            log['activity_log']['function'] = 'endpoint_user_auto_login_get'
-                                            log['activity_log']['result'] = 'Success' #* response
-                                            log['activity_log']['response'] = json.dumps(data,default=formatter_datetime)
-                                            log['activity_log']['json'] = json.dumps(query,default=formatter_datetime) #* request
-                                            log['activity_log']['ip'] = request.remote_addr #*
-                                            log['activity_log']['added_on'] = str(datetime.datetime.now()).split('.', maxsplit=1)[0]
-                                            insert_activity_log(input_function=log)
+                                            create_log('endpoint_user_auto_login_get', 'user_auto_login', headers, data, query, ip= request.remote_addr)
                                             return jsonify(data), 200
+                                        
                                         else:
                                             data = {'message': '500 Internal Server Error - Forbidden'}
                                             insert_file_log(function='endpoint_user_auto_login_get', \

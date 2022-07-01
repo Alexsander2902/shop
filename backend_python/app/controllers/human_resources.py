@@ -30,13 +30,12 @@ from app.utils.util import pathget
 from app.utils.util import pathset
 from app.utils.util import check_header
 from app.utils.util import insert_file_log
-from app.utils.util import formatter_datetime
 from app.utils.util import generate_password
 
 # Controllers
 from app.controllers import key
 from app.controllers import check_session
-from app.controllers import insert_activity_log
+from app.controllers.logs import create_log
 
 
 def endpoint_genders_get():
@@ -60,30 +59,11 @@ def endpoint_genders_get():
                         if execute_query_response['content'] or not request.args.get('id'):
                             if (len(execute_query_response['content']) == 1 and request.args.get('id')) or \
                                 (len(execute_query_response['content']) >= 0 and not request.args.get('id')):
+                                    
                                 data = execute_query_response['content']
-                                log = {}
-                                log['activity_log'] = {}
-                                log['activity_log']['id'] = str(uuid.uuid4()).upper()
-                                if 'User-Id' in headers:
-                                    log['activity_log']['user_id_fk'] = headers['User-Id'] #*
-                                if 'Channel_Contact_Id' in headers:
-                                    log['activity_log']['channel_contact_id_fk'] = headers['Channel-Contact-Id'] #*
-                                log['activity_log']['rel_id'] = None #*
-                                if (len(execute_query_response['content']) == 1 and request.args.get('id')):
-                                    log['activity_log']['rel_id'] = execute_query_response['content'][0]['gender']['id']
-                                log['activity_log']['section'] = headers['Section']
-                                log['activity_log']['description'] = headers['Description']
-                                log['activity_log']['description_complement'] = headers['Description-Complement']
-                                log['activity_log']['complementary_information'] = headers['Complementary-Information']
-                                log['activity_log']['model'] = ''
-                                log['activity_log']['function'] = 'endpoint_genders_get'
-                                log['activity_log']['result'] = 'Success' #* response
-                                log['activity_log']['response'] = json.dumps(data,default=formatter_datetime)
-                                log['activity_log']['json'] = json.dumps(query,default=formatter_datetime) #* request
-                                log['activity_log']['ip'] = request.remote_addr #*
-                                log['activity_log']['added_on'] = str(datetime.datetime.now()).split('.', maxsplit=1)[0]
-                                insert_activity_log(input_function=log)
+                                create_log('endpoint_genders_get', 'gender', headers, data, query, ip= request.remote_addr)
                                 return jsonify(data), 200
+                            
                             else:
                                 data = {'message': '500 Internal Server Error - Not found uniq'}
                                 insert_file_log(function='endpoint_genders_get', \
@@ -176,29 +156,11 @@ def endpoint_genders_post():
                     #print('pos request_json',json.dumps(query,indent=4))
                     execute_query_response = execute_query_genders_post(query=query['gender'], credentials=credentials)
                     if execute_query_response['status']:
-                        #data = {'message': 'Registro inserido ('+query['gender']['id']+')'}
+                        
                         data = {'gender': {'id': query['gender']['id']}}
-                        log = {}
-                        log['activity_log'] = {}
-                        log['activity_log']['id'] = str(uuid.uuid4()).upper()
-                        if 'User-Id' in headers:
-                            log['activity_log']['user_id_fk'] = headers['User-Id'] #*
-                        if 'Channel_Contact_Id' in headers:
-                            log['activity_log']['channel_contact_id_fk'] = headers['Channel-Contact-Id'] #*
-                        log['activity_log']['rel_id'] = query['gender']['id']
-                        log['activity_log']['section'] = headers['Section']
-                        log['activity_log']['description'] = headers['Description']
-                        log['activity_log']['description_complement'] = headers['Description-Complement']
-                        log['activity_log']['complementary_information'] = headers['Complementary-Information']
-                        log['activity_log']['model'] = ''
-                        log['activity_log']['function'] = 'endpoint_genders_post'
-                        log['activity_log']['result'] = 'Success' #* response 200
-                        log['activity_log']['response'] = json.dumps(data,default=formatter_datetime)
-                        log['activity_log']['json'] = json.dumps(query,default=formatter_datetime) #* request
-                        log['activity_log']['ip'] = request.remote_addr #*
-                        log['activity_log']['added_on'] = str(datetime.datetime.now()).split('.', maxsplit=1)[0]
-                        insert_activity_log(input_function=log)
+                        create_log('endpoint_genders_post', 'gender', headers, data, query, ip= request.remote_addr)
                         return jsonify(data), 200
+                    
                     else:
                         data = {'message': '500 Internal Server Error - Error in connection or insert'}
                         insert_file_log(function='endpoint_genders_post', \
@@ -273,28 +235,11 @@ def endpoint_genders_patch():
                     #print('pos request_json',json.dumps(query,indent=4))
                     execute_query_response = execute_query_genders_patch(query=query['gender'], credentials=credentials)
                     if execute_query_response['status']:
-                        #data = {'message': 'Registro atualizado ('+query['gender']['id']+')'}
+                        
                         data = {'gender': {'id': query['gender']['id']}}
-                        log = {}
-                        log['activity_log'] = {}
-                        log['activity_log']['id'] = str(uuid.uuid4()).upper()
-                        if 'User-Id' in headers:
-                            log['activity_log']['user_id_fk'] = headers['User-Id'] #*
-                        if 'Channel_Contact_Id' in headers:
-                            log['activity_log']['channel_contact_id_fk'] = headers['Channel-Contact-Id'] #*
-                        log['activity_log']['rel_id'] = query['gender']['id']
-                        log['activity_log']['section'] = headers['Section']
-                        log['activity_log']['description'] = headers['Description']
-                        log['activity_log']['description_complement'] = headers['Description-Complement']
-                        log['activity_log']['complementary_information'] = headers['Complementary-Information']
-                        log['activity_log']['model'] = ''
-                        log['activity_log']['function'] = 'endpoint_genders_patch'
-                        log['activity_log']['result'] = 'Success' #* response
-                        log['activity_log']['json'] = json.dumps(query,default=formatter_datetime) #* request
-                        log['activity_log']['ip'] = request.remote_addr #*
-                        log['activity_log']['added_on'] = str(datetime.datetime.now()).split('.', maxsplit=1)[0]
-                        insert_activity_log(input_function=log)
+                        create_log('endpoint_genders_patch', 'gender', headers, data, query, ip= request.remote_addr)
                         return jsonify(data), 200
+                    
                     else:
                         data = {'message': '500 Internal Server Error - Error in connection or insert'}
                         insert_file_log(function='endpoint_genders_patch', \
@@ -338,30 +283,11 @@ def endpoint_users_get():
                         if execute_query_response['content'] or not request.args.get('id'):
                             if (len(execute_query_response['content']) == 1 and request.args.get('id')) or \
                                 (len(execute_query_response['content']) >= 0 and not request.args.get('id')):
+                                                                                  
                                 data = execute_query_response['content']
-                                log = {}
-                                log['activity_log'] = {}
-                                log['activity_log']['id'] = str(uuid.uuid4()).upper()
-                                if 'User-Id' in headers:
-                                    log['activity_log']['user_id_fk'] = headers['User-Id'] #*
-                                if 'Channel_Contact_Id' in headers:
-                                    log['activity_log']['channel_contact_id_fk'] = headers['Channel-Contact-Id'] #*
-                                log['activity_log']['rel_id'] = None #*
-                                if (len(execute_query_response['content']) == 1 and request.args.get('id')):
-                                    log['activity_log']['rel_id'] = execute_query_response['content'][0]['user']['id']
-                                log['activity_log']['section'] = headers['Section']
-                                log['activity_log']['description'] = headers['Description']
-                                log['activity_log']['description_complement'] = headers['Description-Complement']
-                                log['activity_log']['complementary_information'] = headers['Complementary-Information']
-                                log['activity_log']['model'] = ''
-                                log['activity_log']['function'] = 'endpoint_users_get'
-                                log['activity_log']['result'] = 'Success' #* response
-                                log['activity_log']['response'] = json.dumps(data,default=formatter_datetime)
-                                log['activity_log']['json'] = json.dumps(query,default=formatter_datetime) #* request
-                                log['activity_log']['ip'] = request.remote_addr #*
-                                log['activity_log']['added_on'] = str(datetime.datetime.now()).split('.', maxsplit=1)[0]
-                                insert_activity_log(input_function=log)
+                                create_log('endpoint_users_get', 'user', headers, data, query, ip= request.remote_addr)
                                 return jsonify(data), 200
+                            
                             else:
                                 data = {'message': '500 Internal Server Error - Not found uniq'}
                                 insert_file_log(function='endpoint_users_get', \
@@ -484,30 +410,11 @@ def endpoint_users_post():
                         if len(execute_query_response['content']) == 0:
                             execute_query_response2 = execute_query_users_post(query=query['user'], credentials=credentials)
                             if execute_query_response2['status']:
-                                #data = {'message': 'Registro inserido ('+query['user']['id']+')'}
+                                
                                 data = {'user': {'id': query['user']['id']}}
-                                log = {}
-                                log['activity_log'] = {}
-                                log['activity_log']['id'] = str(uuid.uuid4()).upper()
-                                if 'User-Id' in headers:
-                                    log['activity_log']['user_id_fk'] = headers['User-Id'] #*
-                                if 'Channel_Contact_Id' in headers:
-                                    log['activity_log']['channel_contact_id_fk'] = headers['Channel-Contact-Id'] #*
-                                log['activity_log']['rel_id'] = query['user']['id']
-                                log['activity_log']['section'] = headers['Section']
-                                log['activity_log']['description'] = headers['Description']
-                                log['activity_log']['description_complement'] = headers['Description-Complement']
-                                log['activity_log']['complementary_information'] = headers['Complementary-Information']
-                                log['activity_log']['model'] = ''
-                                log['activity_log']['function'] = 'endpoint_users_post'
-                                log['activity_log']['result'] = 'Success' #* response
-                                log['activity_log']['response'] = json.dumps(data,default=formatter_datetime)
-                                query['user']['password'] = str(query['user']['password'])
-                                log['activity_log']['json'] = json.dumps(query,default=formatter_datetime) #* request
-                                log['activity_log']['ip'] = request.remote_addr #*
-                                log['activity_log']['added_on'] = str(datetime.datetime.now()).split('.', maxsplit=1)[0]
-                                insert_activity_log(input_function=log)
+                                create_log('endpoint_genders_get', 'gender', headers, data, query, ip= request.remote_addr)
                                 return jsonify(data), 200
+                            
                             else:
                                 data = {'message': '500 Internal Server Error - Error in connection or insert'}
                                 insert_file_log(function='endpoint_users_post', \
@@ -631,33 +538,11 @@ def endpoint_users_patch():
                         if len(execute_query_response['content']) == 1:
                             execute_query_response2 = execute_query_users_patch(query=query['user'], credentials=credentials)
                             if execute_query_response2['status']:
-                                #data = {'message': 'Registro atualizado ('+query['user']['id']+')'}
+                                
                                 data = {'user': {'id': query['user']['id']}}
-                                log = {}
-                                log['activity_log'] = {}
-                                log['activity_log']['id'] = str(uuid.uuid4()).upper()
-                                if 'User-Id' in headers:
-                                    log['activity_log']['user_id_fk'] = headers['User-Id'] #*
-                                if 'Channel_Contact_Id' in headers:
-                                    log['activity_log']['channel_contact_id_fk'] = headers['Channel-Contact-Id'] #*
-                                log['activity_log']['rel_id'] = query['user']['id']
-                                log['activity_log']['section'] = headers['Section']
-                                log['activity_log']['description'] = headers['Description']
-                                log['activity_log']['description_complement'] = headers['Description-Complement']
-                                log['activity_log']['complementary_information'] = headers['Complementary-Information']
-                                log['activity_log']['model'] = ''
-                                log['activity_log']['function'] = 'endpoint_users_patch'
-                                log['activity_log']['result'] = 'Success' #* response
-                                log['activity_log']['response'] = json.dumps(data,default=formatter_datetime)
-                                if 'password' in query['user']:
-                                    query['user']['password'] = str(query['user']['password'])
-                                else:
-                                    query['user']['password'] = ''
-                                log['activity_log']['json'] = json.dumps(query,default=formatter_datetime) #* request
-                                log['activity_log']['ip'] = request.remote_addr #*
-                                log['activity_log']['added_on'] = str(datetime.datetime.now()).split('.', maxsplit=1)[0]
-                                insert_activity_log(input_function=log)
+                                create_log('endpoint_users_get', 'user', headers, data, query, ip= request.remote_addr)
                                 return jsonify(data), 200
+                            
                             else:
                                 data = {'message': '500 Internal Server Error - Error in connection or insert'}
                                 insert_file_log(function='endpoint_users_put', \

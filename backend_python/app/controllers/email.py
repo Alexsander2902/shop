@@ -35,7 +35,8 @@ gmail_credentials = json.loads(load_file(file='./constants/gmail.json'))
 # Controllers
 from app.controllers import key
 from app.controllers import check_session
-from app.controllers import insert_activity_log
+from app.controllers.logs import insert_activity_log
+from app.controllers.logs import create_log
 
 
 def endpoint_email_queues_get():
@@ -59,30 +60,11 @@ def endpoint_email_queues_get():
                         if execute_query_response['content'] or not request.args.get('id'):
                             if (len(execute_query_response['content']) == 1 and request.args.get('id')) or \
                                 (len(execute_query_response['content']) >= 0 and not request.args.get('id')):
+                                    
                                 data = execute_query_response['content']
-                                log = {}
-                                log['activity_log'] = {}
-                                log['activity_log']['id'] = str(uuid.uuid4()).upper()
-                                if 'User-Id' in headers:
-                                    log['activity_log']['user_id_fk'] = headers['User-Id'] #*
-                                if 'Channel_Contact_Id' in headers:
-                                    log['activity_log']['channel_contact_id_fk'] = headers['Channel-Contact-Id'] #*
-                                log['activity_log']['rel_id'] = None #*
-                                if (len(execute_query_response['content']) == 1 and request.args.get('id')):
-                                    log['activity_log']['rel_id'] = execute_query_response['content'][0]['email_queue']['id']
-                                log['activity_log']['section'] = headers['Section']
-                                log['activity_log']['description'] = headers['Description']
-                                log['activity_log']['description_complement'] = headers['Description-Complement']
-                                log['activity_log']['complementary_information'] = headers['Complementary-Information']
-                                log['activity_log']['model'] = ''
-                                log['activity_log']['function'] = 'endpoint_email_queues_get'
-                                log['activity_log']['result'] = 'Success' #* response
-                                log['activity_log']['response'] = json.dumps(data,default=formatter_datetime)
-                                log['activity_log']['json'] = json.dumps(query,default=formatter_datetime) #* request
-                                log['activity_log']['ip'] = request.remote_addr #*
-                                log['activity_log']['added_on'] = str(datetime.datetime.now()).split('.', maxsplit=1)[0]
-                                insert_activity_log(input_function=log)
+                                create_log('endpoint_email_queues_get', 'email_queue', headers, data, query, ip= request.remote_addr)
                                 return jsonify(data), 200
+                            
                             else:
                                 data = {'message': '500 Internal Server Error - Not found uniq'}
                                 insert_file_log(function='endpoint_email_queues_get', \
@@ -292,30 +274,11 @@ def endpoint_email_queues_post():
                             else:
                                 insert_file_log(function='endpoint_email_queues_post', \
                                 input_function=['execute_query_response: ',execute_query_response2['content']])
-                        #
-                        #data = {'message': 'Registro inserido ('+query['email_queue']['id']+')'}
+                                
                         data = {'email_queue': {'id': query['email_queue']['id']}}
-                        log = {}
-                        log['activity_log'] = {}
-                        log['activity_log']['id'] = str(uuid.uuid4()).upper()
-                        if 'User-Id' in headers:
-                            log['activity_log']['user_id_fk'] = headers['User-Id'] #*
-                        if 'Channel_Contact_Id' in headers:
-                            log['activity_log']['channel_contact_id_fk'] = headers['Channel-Contact-Id'] #*
-                        log['activity_log']['rel_id'] = query['email_queue']['id']
-                        log['activity_log']['section'] = headers['Section']
-                        log['activity_log']['description'] = headers['Description']
-                        log['activity_log']['description_complement'] = headers['Description-Complement']
-                        log['activity_log']['complementary_information'] = headers['Complementary-Information']
-                        log['activity_log']['model'] = ''
-                        log['activity_log']['function'] = 'endpoint_email_queues_post'
-                        log['activity_log']['result'] = 'Success' #* response 200
-                        log['activity_log']['response'] = json.dumps(data,default=formatter_datetime)
-                        log['activity_log']['json'] = json.dumps(query,default=formatter_datetime) #* request
-                        log['activity_log']['ip'] = request.remote_addr #*
-                        log['activity_log']['added_on'] = str(datetime.datetime.now()).split('.', maxsplit=1)[0]
-                        insert_activity_log(input_function=log)
+                        create_log('endpoint_email_queues_post', 'email_queue', headers, data, query, ip= request.remote_addr)
                         return jsonify(data), 200
+                    
                     else:
                         data = {'message': '500 Internal Server Error - Error in connection or insert'}
                         insert_file_log(function='endpoint_email_queues_post', \
@@ -460,28 +423,11 @@ def endpoint_email_queues_patch():
                     #print('pos request_json',json.dumps(query,indent=4))
                     execute_query_response = execute_query_email_queues_patch(query=query['email_queue'], credentials=credentials)
                     if execute_query_response['status']:
-                        #data = {'message': 'Registro atualizado ('+query['email_queue']['id']+')'}
+                        
                         data = {'email_queue': {'id': query['email_queue']['id']}}
-                        log = {}
-                        log['activity_log'] = {}
-                        log['activity_log']['id'] = str(uuid.uuid4()).upper()
-                        if 'User-Id' in headers:
-                            log['activity_log']['user_id_fk'] = headers['User-Id'] #*
-                        if 'Channel_Contact_Id' in headers:
-                            log['activity_log']['channel_contact_id_fk'] = headers['Channel-Contact-Id'] #*
-                        log['activity_log']['rel_id'] = query['email_queue']['id']
-                        log['activity_log']['section'] = headers['Section']
-                        log['activity_log']['description'] = headers['Description']
-                        log['activity_log']['description_complement'] = headers['Description-Complement']
-                        log['activity_log']['complementary_information'] = headers['Complementary-Information']
-                        log['activity_log']['model'] = ''
-                        log['activity_log']['function'] = 'endpoint_email_queues_patch'
-                        log['activity_log']['result'] = 'Success' #* response
-                        log['activity_log']['json'] = json.dumps(query,default=formatter_datetime) #* request
-                        log['activity_log']['ip'] = request.remote_addr #*
-                        log['activity_log']['added_on'] = str(datetime.datetime.now()).split('.', maxsplit=1)[0]
-                        insert_activity_log(input_function=log)
+                        create_log('endpoint_email_queues_patch', 'email_queue', headers, data, query, ip= request.remote_addr)
                         return jsonify(data), 200
+                    
                     else:
                         data = {'message': '500 Internal Server Error - Error in connection or insert'}
                         insert_file_log(function='endpoint_email_queues_patch', \
@@ -525,30 +471,11 @@ def endpoint_email_templates_get():
                         if execute_query_response['content'] or not request.args.get('id'):
                             if (len(execute_query_response['content']) == 1 and request.args.get('id')) or \
                                 (len(execute_query_response['content']) >= 0 and not request.args.get('id')):
+                                    
                                 data = execute_query_response['content']
-                                log = {}
-                                log['activity_log'] = {}
-                                log['activity_log']['id'] = str(uuid.uuid4()).upper()
-                                if 'User-Id' in headers:
-                                    log['activity_log']['user_id_fk'] = headers['User-Id'] #*
-                                if 'Channel_Contact_Id' in headers:
-                                    log['activity_log']['channel_contact_id_fk'] = headers['Channel-Contact-Id'] #*
-                                log['activity_log']['rel_id'] = None #*
-                                if (len(execute_query_response['content']) == 1 and request.args.get('id')):
-                                    log['activity_log']['rel_id'] = execute_query_response['content'][0]['email_template']['id']
-                                log['activity_log']['section'] = headers['Section']
-                                log['activity_log']['description'] = headers['Description']
-                                log['activity_log']['description_complement'] = headers['Description-Complement']
-                                log['activity_log']['complementary_information'] = headers['Complementary-Information']
-                                log['activity_log']['model'] = ''
-                                log['activity_log']['function'] = 'endpoint_email_templates_get'
-                                log['activity_log']['result'] = 'Success' #* response
-                                log['activity_log']['response'] = json.dumps(data,default=formatter_datetime)
-                                log['activity_log']['json'] = json.dumps(query,default=formatter_datetime) #* request
-                                log['activity_log']['ip'] = request.remote_addr #*
-                                log['activity_log']['added_on'] = str(datetime.datetime.now()).split('.', maxsplit=1)[0]
-                                insert_activity_log(input_function=log)
+                                create_log('endpoint_email_templates_get', 'email_template', headers, data, query, ip= request.remote_addr)
                                 return jsonify(data), 200
+                            
                             else:
                                 data = {'message': '500 Internal Server Error - Not found uniq'}
                                 insert_file_log(function='endpoint_email_templates_get', \
@@ -659,40 +586,16 @@ def endpoint_email_templates_post():
                     input_validation_errors += check_field_result['content']
                 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
                 query['email_template']['added_on'] = str(datetime.datetime.now()).split('.', maxsplit=1)[0]
-                #field = ['email_template','added_on']
-                #check_field_result = check_field(input_function=copy.deepcopy(request_json),field=field,type='timestamp',default=str(datetime.datetime.now()).split('.', maxsplit=1)[0],optional=False)
-                #if check_field_result['status']:
-                #    query = check_field_result['content']
-                #else:
-                #    input_validation_errors += check_field_result['content']
                 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
                 if not input_validation_errors:
                     #print('pos request_json',json.dumps(query,indent=4))
                     execute_query_response = execute_query_email_templates_post(query=query['email_template'], credentials=credentials)
                     if execute_query_response['status']:
-                        #data = {'message': 'Registro inserido ('+query['email_template']['id']+')'}
+                        
                         data = {'email_template': {'id': query['email_template']['id']}}
-                        log = {}
-                        log['activity_log'] = {}
-                        log['activity_log']['id'] = str(uuid.uuid4()).upper()
-                        if 'User-Id' in headers:
-                            log['activity_log']['user_id_fk'] = headers['User-Id'] #*
-                        if 'Channel_Contact_Id' in headers:
-                            log['activity_log']['channel_contact_id_fk'] = headers['Channel-Contact-Id'] #*
-                        log['activity_log']['rel_id'] = query['email_template']['id']
-                        log['activity_log']['section'] = headers['Section']
-                        log['activity_log']['description'] = headers['Description']
-                        log['activity_log']['description_complement'] = headers['Description-Complement']
-                        log['activity_log']['complementary_information'] = headers['Complementary-Information']
-                        log['activity_log']['model'] = ''
-                        log['activity_log']['function'] = 'endpoint_email_templates_post'
-                        log['activity_log']['result'] = 'Success' #* response 200
-                        log['activity_log']['response'] = json.dumps(data,default=formatter_datetime)
-                        log['activity_log']['json'] = json.dumps(query,default=formatter_datetime) #* request
-                        log['activity_log']['ip'] = request.remote_addr #*
-                        log['activity_log']['added_on'] = str(datetime.datetime.now()).split('.', maxsplit=1)[0]
-                        insert_activity_log(input_function=log)
+                        create_log('endpoint_email_templates_post', 'email_template', headers, data, query, ip= request.remote_addr)
                         return jsonify(data), 200
+                    
                     else:
                         data = {'message': '500 Internal Server Error - Error in connection or insert'}
                         insert_file_log(function='endpoint_email_templates_post', \
@@ -795,28 +698,11 @@ def endpoint_email_templates_patch():
                     #print('pos request_json',json.dumps(query,indent=4))
                     execute_query_response = execute_query_email_templates_patch(query=query['email_template'], credentials=credentials)
                     if execute_query_response['status']:
-                        #data = {'message': 'Registro atualizado ('+query['email_template']['id']+')'}
+                        
                         data = {'email_template': {'id': query['email_template']['id']}}
-                        log = {}
-                        log['activity_log'] = {}
-                        log['activity_log']['id'] = str(uuid.uuid4()).upper()
-                        if 'User-Id' in headers:
-                            log['activity_log']['user_id_fk'] = headers['User-Id'] #*
-                        if 'Channel_Contact_Id' in headers:
-                            log['activity_log']['channel_contact_id_fk'] = headers['Channel-Contact-Id'] #*
-                        log['activity_log']['rel_id'] = query['email_template']['id']
-                        log['activity_log']['section'] = headers['Section']
-                        log['activity_log']['description'] = headers['Description']
-                        log['activity_log']['description_complement'] = headers['Description-Complement']
-                        log['activity_log']['complementary_information'] = headers['Complementary-Information']
-                        log['activity_log']['model'] = ''
-                        log['activity_log']['function'] = 'endpoint_email_templates_patch'
-                        log['activity_log']['result'] = 'Success' #* response
-                        log['activity_log']['json'] = json.dumps(query,default=formatter_datetime) #* request
-                        log['activity_log']['ip'] = request.remote_addr #*
-                        log['activity_log']['added_on'] = str(datetime.datetime.now()).split('.', maxsplit=1)[0]
-                        insert_activity_log(input_function=log)
+                        create_log('endpoint_email_templates_patch', 'email_template', headers, data, query, ip= request.remote_addr)
                         return jsonify(data), 200
+                    
                     else:
                         data = {'message': '500 Internal Server Error - Error in connection or insert'}
                         insert_file_log(function='endpoint_email_templates_patch', \
