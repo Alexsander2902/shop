@@ -113,6 +113,7 @@ def endpoint_upload(table, id, name):
 def endpoint_activity_logs_get():
     """ doctest for endpoint_activity_logs_get (pendent try exception global of function) without unit test
     """
+    endpoint = 'endpoint_activity_logs_get'
     endpoint_response = {} 
     endpoint_response['status'] = False
     endpoint_response['content'] = None
@@ -134,35 +135,29 @@ def endpoint_activity_logs_get():
                                 (len(execute_query_response['content']) >= 0 and not request.args.get('id')):
                                     
                                 data = execute_query_response['content']
-                                create_log('endpoint_activity_logs_get', 'activity_log', headers, data, query, ip= request.remote_addr)
+                                create_log(endpoint, 'activity_log', headers, data, query, ip= request.remote_addr)
                                 return jsonify(data), 200
                             
                             else:
                                 data = {'message': '500 Internal Server Error - Not found uniq'}
-                                insert_file_log(function='endpoint_activity_logs_get', \
-                                    input_function=['query: ',query,'execute_query_response: ',execute_query_response['content']])
+                                insert_file_log(function=endpoint, input_function=['query: ',query,'execute_query_response: ',execute_query_response['content']])
                                 return jsonify(data), 500
                         else:
                             data = {'message': '500 Internal Server Error - Not found'}
-                            insert_file_log(function='endpoint_activity_logs_get', \
-                                input_function=['query: ',query,'execute_query_response: ',execute_query_response['content']])
+                            insert_file_log(function=endpoint, input_function=['query: ',query,'execute_query_response: ',execute_query_response['content']])
                             return jsonify(data), 500
                     else:
                         data = {'message': '500 Internal Server Error - Error in connection or insert'}
-                        insert_file_log(function='endpoint_activity_logs_get', \
-                            input_function=['query: ',query,'execute_query_response: ',execute_query_response['content']])
+                        insert_file_log(function=endpoint, input_function=['query: ',query,'execute_query_response: ',execute_query_response['content']])
                         return jsonify(data), 500
                 else:
-                    insert_file_log(function='endpoint_activity_logs_get', \
-                        input_function=['query: ',query,'input_validation_errors: ',input_validation_errors])
+                    insert_file_log(function=endpoint, input_function=['query: ',query,'input_validation_errors: ',input_validation_errors])
                     return jsonify({"message": "500 Internal Server Error - Fields format error ("+str(input_validation_errors)+")"}), 500
             else:
-                insert_file_log(function='endpoint_activity_logs_get', \
-                    input_function=['headers: ',headers,'check_session_response: ',check_session_response['content']])
+                insert_file_log(function=endpoint, input_function=['headers: ',headers,'check_session_response: ',check_session_response['content']])
                 return jsonify({"message": "403 Forbidden - "+check_session_response['content']}), 403
         else:
-            insert_file_log(function='endpoint_activity_logs_get', \
-                input_function=['headers: ',headers,'check_header_response: ',check_header_response['content']])
+            insert_file_log(function=endpoint, input_function=['headers: ',headers,'check_header_response: ',check_header_response['content']])
             return jsonify({"message": "403 Forbidden - "+check_header_response['content']}), 403
     #except Exception as e:
     #    exc_type, exc_obj, exc_tb = sys.exc_info()

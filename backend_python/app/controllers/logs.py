@@ -5,9 +5,6 @@ import json
 import datetime
 import uuid
 
-# Webserver
-from flask import request
-
 # Utils
 from app.utils.util import formatter_datetime
 from app.utils.util import check_field
@@ -15,16 +12,14 @@ from app.utils.util import insert_file_log
 
 # Models
 from app.models import credentials
-from app.models.human_resources import execute_query_users_get
 from app.models.misc import execute_query_activity_log_post
 
 
 def create_log(endpoint:str, table, headers, data, query, ip):
     
     method = endpoint.split("_")[-1]
-    print(method)
     if method == 'get':
-        if (len(data) == 1 and query['id'] != ""):
+        if (len(data) == 1 and 'id' in query):
             activity_log = data[0][table]['id']
         else:
             activity_log = None #*
