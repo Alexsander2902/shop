@@ -32,11 +32,13 @@ from app.utils.util import formatter_datetime
 # Controllers
 from app.controllers import key
 from app.controllers import check_session
-from app.controllers import insert_activity_log
+from app.controllers.logs import insert_activity_log
+from app.controllers.logs import create_log
 
 def endpoint_authentication_post():
     """ doctest for endpoint_authentication_post (pendent try exception global of function) without unit test
     """
+    endpoint = 'endpoint_authentication_post'
     endpoint_response = {}
     endpoint_response['status'] = False
     endpoint_response['content'] = None
@@ -48,7 +50,7 @@ def endpoint_authentication_post():
         log['activity_log']['id'] = str(uuid.uuid4()).upper()
         log['activity_log']['user_id_fk'] = None #*
         log['activity_log']['model'] = ''
-        log['activity_log']['function'] = 'endpoint_authentication_post'
+        log['activity_log']['function'] = endpoint
         log['activity_log']['ip'] = request.remote_addr #*
         log['activity_log']['added_on'] = str(datetime.datetime.now()).split('.', maxsplit=1)[0]
         check_header_response = check_header(header=headers,key=key)
@@ -134,21 +136,17 @@ def endpoint_authentication_post():
                             return jsonify(data), 500
                     else:
                         data = {'message': '500 Internal Server Error - Login not found or duplicated'}
-                        insert_file_log(function='endpoint_authentication_post', \
-                            input_function=['request_json: ',request_json,'execute_query_response: ',execute_query_response['content']])
+                        insert_file_log(function=endpoint, input_function=['request_json: ',request_json,'execute_query_response: ',execute_query_response['content']])
                         return jsonify(data), 500
                 else:
                     data = {'message': '500 Internal Server Error - Error in connection or insert'}
-                    insert_file_log(function='endpoint_authentication_post', \
-                        input_function=['request_json: ',request_json,'execute_query_response: ',execute_query_response['content']])
+                    insert_file_log(function=endpoint, input_function=['request_json: ',request_json,'execute_query_response: ',execute_query_response['content']])
                     return jsonify(data), 500
             else:
-                insert_file_log(function='endpoint_authentication_post', \
-                    input_function=['request_json: ',request_json,'input_validation_errors: ',input_validation_errors])
+                insert_file_log(function=endpoint, input_function=['request_json: ',request_json,'input_validation_errors: ',input_validation_errors])
                 return jsonify({"message": "500 Internal Server Error - Fields format error ("+input_validation_errors+")"}), 500
         else:
-            insert_file_log(function='endpoint_authentication_post', \
-                input_function=['headers: ',headers,'check_header_response: ',check_header_response['content']])
+            insert_file_log(function=endpoint, input_function=['headers: ',headers,'check_header_response: ',check_header_response['content']])
             return jsonify({"message": "403 Forbidden - "+check_header_response['content']}), 403
     #except Exception as e:
     #    exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -159,6 +157,7 @@ def endpoint_authentication_post():
 def endpoint_user_auto_login_get():
     """ doctest for endpoint_user_auto_login_get (pendent try exception global of function) without unit test
     """
+    endpoint = 'endpoint_user_auto_login_get'
     endpoint_response = {}
     endpoint_response['status'] = False
     endpoint_response['content'] = None
@@ -181,70 +180,44 @@ def endpoint_user_auto_login_get():
                                     execute_query_response = execute_query_user_auto_login_get(query=query, credentials=credentials)
                                     if execute_query_response['status']:
                                         if (len(execute_query_response['content']) == 1):
+                                            
                                             data = execute_query_response3['content'][0]
                                             data['user_auto_login'] = execute_query_response['content'][0]['user_auto_login']
-                                            log = {}
-                                            log['activity_log'] = {}
-                                            log['activity_log']['id'] = str(uuid.uuid4()).upper()
-                                            if 'User-Id' in headers:
-                                                log['activity_log']['user_id_fk'] = headers['User-Id'] #*
-                                            if 'Channel_Contact_Id' in headers:
-                                                log['activity_log']['channel_contact_id_fk'] = headers['Channel-Contact-Id'] #*
-                                            log['activity_log']['rel_id'] = query['user_id_fk']
-                                            log['activity_log']['section'] = headers['Section']
-                                            log['activity_log']['description'] = headers['Description']
-                                            log['activity_log']['description_complement'] = headers['Description-Complement']
-                                            log['activity_log']['complementary_information'] = headers['Complementary-Information']
-                                            log['activity_log']['model'] = ''
-                                            log['activity_log']['function'] = 'endpoint_user_auto_login_get'
-                                            log['activity_log']['result'] = 'Success' #* response
-                                            log['activity_log']['response'] = json.dumps(data,default=formatter_datetime)
-                                            log['activity_log']['json'] = json.dumps(query,default=formatter_datetime) #* request
-                                            log['activity_log']['ip'] = request.remote_addr #*
-                                            log['activity_log']['added_on'] = str(datetime.datetime.now()).split('.', maxsplit=1)[0]
-                                            insert_activity_log(input_function=log)
+                                            create_log(endpoint, 'user_auto_login', headers, data, query, ip= request.remote_addr)
                                             return jsonify(data), 200
+                                        
                                         else:
                                             data = {'message': '500 Internal Server Error - Forbidden'}
-                                            insert_file_log(function='endpoint_user_auto_login_get', \
-                                                input_function=['query: ',query,'execute_query_response: ',execute_query_response['content']])
+                                            insert_file_log(function=endpoint, input_function=['query: ',query,'execute_query_response: ',execute_query_response['content']])
                                             return jsonify(data), 500
                                     else:
                                         data = {'message': '500 Internal Server Error - Error in connection or insert'}
-                                        insert_file_log(function='endpoint_user_auto_login_get', \
-                                            input_function=['query: ',query,'execute_query_response: ',execute_query_response['content']])
+                                        insert_file_log(function=endpoint, input_function=['query: ',query,'execute_query_response: ',execute_query_response['content']])
                                         return jsonify(data), 500
                                 else:
                                     data = {'message': '500 Internal Server Error - login Not found'}
-                                    insert_file_log(function='endpoint_user_auto_login_get', \
-                                        input_function=['query: ',query,'execute_query_response: ',execute_query_response3['content']])
+                                    insert_file_log(function=endpoint, input_function=['query: ',query,'execute_query_response: ',execute_query_response3['content']])
                                     return jsonify(data), 500
                             else:
                                 data = {'message': '500 Internal Server Error - Error in connection or insert'}
-                                insert_file_log(function='endpoint_user_auto_login_get', \
-                                    input_function=['query: ',query,'execute_query_response: ',execute_query_response3['content']])
+                                insert_file_log(function=endpoint, input_function=['query: ',query,'execute_query_response: ',execute_query_response3['content']])
                                 return jsonify(data), 500
                         else:
                             data = {'message': '500 Internal Server Error - user_id_fk Not found'}
-                            insert_file_log(function='endpoint_user_auto_login_get', \
-                                input_function=['query: ',query,'execute_query_response: ',execute_query_response2['content']])
+                            insert_file_log(function=endpoint, input_function=['query: ',query,'execute_query_response: ',execute_query_response2['content']])
                             return jsonify(data), 500
                     else:
                         data = {'message': '500 Internal Server Error - Error in connection or insert'}
-                        insert_file_log(function='endpoint_user_auto_login_get', \
-                            input_function=['query: ',query,'execute_query_response: ',execute_query_response2['content']])
+                        insert_file_log(function=endpoint, input_function=['query: ',query,'execute_query_response: ',execute_query_response2['content']])
                         return jsonify(data), 500
                 else:
-                    insert_file_log(function='endpoint_user_auto_login_get', \
-                        input_function=['query: ',query,'input_validation_errors: ',input_validation_errors])
+                    insert_file_log(function=endpoint, input_function=['query: ',query,'input_validation_errors: ',input_validation_errors])
                     return jsonify({"message": "500 Internal Server Error - Fields format error ("+str(input_validation_errors)+")"}), 500
             else:
-                insert_file_log(function='endpoint_user_auto_login_get', \
-                    input_function=['headers: ',headers,'check_session_response: ',check_session_response['content']])
+                insert_file_log(function=endpoint, input_function=['headers: ',headers,'check_session_response: ',check_session_response['content']])
                 return jsonify({"message": "403 Forbidden - "+check_session_response['content']}), 403
         else:
-            insert_file_log(function='endpoint_user_auto_login_get', \
-                input_function=['headers: ',headers,'check_header_response: ',check_header_response['content']])
+            insert_file_log(function=endpoint, input_function=['headers: ',headers,'check_header_response: ',check_header_response['content']])
             return jsonify({"message": "403 Forbidden - "+check_header_response['content']}), 403
     #except Exception as e:
     #    exc_type, exc_obj, exc_tb = sys.exc_info()

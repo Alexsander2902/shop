@@ -3,7 +3,6 @@
 # Libraries
 import re
 import datetime
-import uuid
 import json
 import bcrypt
 
@@ -346,120 +345,6 @@ def check_field(input_function="None",field=['field'],type='type',default='defau
             check_field_response['content'] += str(field)+'_field(s);'
     return check_field_response
 
-def check_activity_log(input_function={}):
-    """ check_activity_log
-    """
-    function_response = {}
-    function_response['status'] = False
-    function_response['content'] = None
-    input_validation_errors = ''
-    query = {}
-    query['activity_log'] = {}
-    # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # id
-    field = ['activity_log','id']
-    check_field_result = check_field(input_function=input_function,field=field,type='uuid',default=str(uuid.uuid4()).upper(),optional=False)
-    if check_field_result['status']:
-        query['activity_log']['id'] = check_field_result['content']['activity_log']['id']
-    else:
-        input_validation_errors += check_field_result['content']
-    # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # user_id_fk
-    field = ['activity_log','user_id_fk']
-    check_field_result = check_field(input_function=input_function,field=field,type='varchar(45)',default=None,optional=True)
-    if check_field_result['status']:
-        query['activity_log']['user_id_fk'] = check_field_result['content']['activity_log']['user_id_fk']
-    else:
-        input_validation_errors += check_field_result['content']
-    # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # rel_id
-    field = ['activity_log','rel_id']
-    check_field_result = check_field(input_function=input_function,field=field,type='varchar(45)',default=None,optional=True)
-    if check_field_result['status']:
-        query['activity_log']['rel_id'] = check_field_result['content']['activity_log']['rel_id']
-    else:
-        input_validation_errors += check_field_result['content']
-    # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # section
-    field = ['activity_log','section']
-    check_field_result = check_field(input_function=input_function,field=field,type='varchar(45)',default=None,optional=True)
-    if check_field_result['status']:
-        query['activity_log']['section'] = check_field_result['content']['activity_log']['section']
-    else:
-        input_validation_errors += check_field_result['content']
-    # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # model
-    field = ['activity_log','model']
-    check_field_result = check_field(input_function=input_function,field=field,type='varchar(50)',default='',optional=False)
-    if check_field_result['status']:
-        query['activity_log']['model'] = check_field_result['content']['activity_log']['model']
-    else:
-        input_validation_errors += check_field_result['content']
-    # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # function
-    field = ['activity_log','function']
-    check_field_result = check_field(input_function=input_function,field=field,type='varchar(100)',default='',optional=False)
-    if check_field_result['status']:
-        query['activity_log']['function'] = check_field_result['content']['activity_log']['function']
-    else:
-        input_validation_errors += check_field_result['content']
-    # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # result
-    field = ['activity_log','result']
-    check_field_result = check_field(input_function=input_function,field=field,type='varchar(25)',default=None,optional=True)
-    if check_field_result['status']:
-        query['activity_log']['result'] = check_field_result['content']['activity_log']['result']
-    else:
-        input_validation_errors += check_field_result['content']
-    # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # description
-    field = ['activity_log','description']
-    check_field_result = check_field(input_function=input_function,field=field,type='varchar(16777215)',default='',optional=False)
-    if check_field_result['status']:
-        query['activity_log']['description'] = check_field_result['content']['activity_log']['description']
-    else:
-        input_validation_errors += check_field_result['content']
-    # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # description_complement
-    field = ['activity_log','description_complement']
-    check_field_result = check_field(input_function=input_function,field=field,type='varchar(16777215)',default=None,optional=True)
-    if check_field_result['status']:
-        query['activity_log']['description_complement'] = check_field_result['content']['activity_log']['description_complement']
-    else:
-        input_validation_errors += check_field_result['content']
-    # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # complementary_information
-    field = ['activity_log','complementary_information']
-    check_field_result = check_field(input_function=input_function,field=field,type='varchar(16777215)',default=None,optional=True)
-    if check_field_result['status']:
-        query['activity_log']['complementary_information'] = check_field_result['content']['activity_log']['complementary_information']
-    else:
-        input_validation_errors += check_field_result['content']
-    # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # json
-    field = ['activity_log','response']
-    check_field_result = check_field(input_function=input_function,field=field,type='varchar(16777215)',default=None,optional=True)
-    if check_field_result['status']:
-        query['activity_log']['response'] = check_field_result['content']['activity_log']['response']
-    else:
-        input_validation_errors += check_field_result['content']
-    # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # json
-    field = ['activity_log','json']
-    check_field_result = check_field(input_function=input_function,field=field,type='varchar(16777215)',default=None,optional=True)
-    if check_field_result['status']:
-        query['activity_log']['json'] = check_field_result['content']['activity_log']['json']
-    else:
-        input_validation_errors += check_field_result['content']
-    # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # ip
-    field = ['activity_log','ip']
-    check_field_result = check_field(input_function=input_function,field=field,type='varchar(100)',default=None,optional=True)
-    if check_field_result['status']:
-        query['activity_log']['ip'] = check_field_result['content']['activity_log']['ip']
-    else:
-        input_validation_errors += check_field_result['content']
-    # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # added_on
-    field = ['activity_log','added_on']
-    check_field_result = check_field(input_function=input_function,field=field,type='timestamp',default=str(datetime.datetime.now()).split('.', maxsplit=1)[0],optional=False)
-    if check_field_result['status']:
-        query['activity_log']['added_on'] = check_field_result['content']['activity_log']['added_on']
-    else:
-        input_validation_errors += check_field_result['content']
-    # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-    if not input_validation_errors:
-        function_response['status'] = True
-    else:
-        function_response['content'] = input_validation_errors
-    return function_response
-
 @timer
 def check_header(header={},key=''):
     """ doctest for check_key (pendent try exception global of function) without unit test
@@ -482,7 +367,6 @@ def check_header(header={},key=''):
         function_response['content'] = 'Not found Key, Section, Description, Description-Complement or Complementary-Information'
     return function_response
 
-@timer
 def insert_file_log(function='',input_function=[]):
     """ insert_file_log
     """

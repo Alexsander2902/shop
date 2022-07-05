@@ -35,12 +35,14 @@ gmail_credentials = json.loads(load_file(file='./constants/gmail.json'))
 # Controllers
 from app.controllers import key
 from app.controllers import check_session
-from app.controllers import insert_activity_log
+from app.controllers.logs import insert_activity_log
+from app.controllers.logs import create_log
 
 
 def endpoint_email_queues_get():
     """ doctest for endpoint_email_queues_get (pendent try exception global of function) without unit test
     """
+    endpoint = 'endpoint_email_queues_get'
     endpoint_response = {}
     endpoint_response['status'] = False
     endpoint_response['content'] = None
@@ -59,56 +61,31 @@ def endpoint_email_queues_get():
                         if execute_query_response['content'] or not request.args.get('id'):
                             if (len(execute_query_response['content']) == 1 and request.args.get('id')) or \
                                 (len(execute_query_response['content']) >= 0 and not request.args.get('id')):
+                                    
                                 data = execute_query_response['content']
-                                log = {}
-                                log['activity_log'] = {}
-                                log['activity_log']['id'] = str(uuid.uuid4()).upper()
-                                if 'User-Id' in headers:
-                                    log['activity_log']['user_id_fk'] = headers['User-Id'] #*
-                                if 'Channel_Contact_Id' in headers:
-                                    log['activity_log']['channel_contact_id_fk'] = headers['Channel-Contact-Id'] #*
-                                log['activity_log']['rel_id'] = None #*
-                                if (len(execute_query_response['content']) == 1 and request.args.get('id')):
-                                    log['activity_log']['rel_id'] = execute_query_response['content'][0]['email_queue']['id']
-                                log['activity_log']['section'] = headers['Section']
-                                log['activity_log']['description'] = headers['Description']
-                                log['activity_log']['description_complement'] = headers['Description-Complement']
-                                log['activity_log']['complementary_information'] = headers['Complementary-Information']
-                                log['activity_log']['model'] = ''
-                                log['activity_log']['function'] = 'endpoint_email_queues_get'
-                                log['activity_log']['result'] = 'Success' #* response
-                                log['activity_log']['response'] = json.dumps(data,default=formatter_datetime)
-                                log['activity_log']['json'] = json.dumps(query,default=formatter_datetime) #* request
-                                log['activity_log']['ip'] = request.remote_addr #*
-                                log['activity_log']['added_on'] = str(datetime.datetime.now()).split('.', maxsplit=1)[0]
-                                insert_activity_log(input_function=log)
+                                create_log(endpoint, 'email_queue', headers, data, query, ip= request.remote_addr)
                                 return jsonify(data), 200
+                            
                             else:
                                 data = {'message': '500 Internal Server Error - Not found uniq'}
-                                insert_file_log(function='endpoint_email_queues_get', \
-                                    input_function=['query: ',query,'execute_query_response: ',execute_query_response['content']])
+                                insert_file_log(function=endpoint, input_function=['query: ',query,'execute_query_response: ',execute_query_response['content']])
                                 return jsonify(data), 500
                         else:
                             data = {'message': '500 Internal Server Error - Not found'}
-                            insert_file_log(function='endpoint_email_queues_get', \
-                                input_function=['query: ',query,'execute_query_response: ',execute_query_response['content']])
+                            insert_file_log(function=endpoint, input_function=['query: ',query,'execute_query_response: ',execute_query_response['content']])
                             return jsonify(data), 500
                     else:
                         data = {'message': '500 Internal Server Error - Error in connection or insert'}
-                        insert_file_log(function='endpoint_email_queues_get', \
-                            input_function=['query: ',query,'execute_query_response: ',execute_query_response['content']])
+                        insert_file_log(function=endpoint, input_function=['query: ',query,'execute_query_response: ',execute_query_response['content']])
                         return jsonify(data), 500
                 else:
-                    insert_file_log(function='endpoint_email_queues_get', \
-                        input_function=['query: ',query,'input_validation_errors: ',input_validation_errors])
+                    insert_file_log(function=endpoint, input_function=['query: ',query,'input_validation_errors: ',input_validation_errors])
                     return jsonify({"message": "500 Internal Server Error - Fields format error ("+str(input_validation_errors)+")"}), 500
             else:
-                insert_file_log(function='endpoint_email_queues_get', \
-                    input_function=['headers: ',headers,'check_session_response: ',check_session_response['content']])
+                insert_file_log(function=endpoint, input_function=['headers: ',headers,'check_session_response: ',check_session_response['content']])
                 return jsonify({"message": "403 Forbidden - "+check_session_response['content']}), 403
         else:
-            insert_file_log(function='endpoint_email_queues_get', \
-                input_function=['headers: ',headers,'check_header_response: ',check_header_response['content']])
+            insert_file_log(function=endpoint, input_function=['headers: ',headers,'check_header_response: ',check_header_response['content']])
             return jsonify({"message": "403 Forbidden - "+check_header_response['content']}), 403
     #except Exception as e:
     #    exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -118,6 +95,7 @@ def endpoint_email_queues_get():
 def endpoint_email_queues_post():
     """ doctest for endpoint_email_queues_post (pendent try exception global of function) without unit test
     """
+    endpoint = 'endpoint_email_queues_post'
     endpoint_response = {}
     endpoint_response['status'] = False
     endpoint_response['content'] = None
@@ -284,54 +262,31 @@ def endpoint_email_queues_post():
                                         #    print('implementar')
                                         #else:
                                         #    print('implementar')
-                                        insert_file_log(function='endpoint_email_queues_patch', \
+                                        insert_file_log(function=endpoint, \
                                             input_function=['email_response False'])
                                 else:
                                     insert_file_log(function='send_mail', \
                                         input_function=['engine False'])
                             else:
-                                insert_file_log(function='endpoint_email_queues_post', \
+                                insert_file_log(function=endpoint, \
                                 input_function=['execute_query_response: ',execute_query_response2['content']])
-                        #
-                        #data = {'message': 'Registro inserido ('+query['email_queue']['id']+')'}
+                                
                         data = {'email_queue': {'id': query['email_queue']['id']}}
-                        log = {}
-                        log['activity_log'] = {}
-                        log['activity_log']['id'] = str(uuid.uuid4()).upper()
-                        if 'User-Id' in headers:
-                            log['activity_log']['user_id_fk'] = headers['User-Id'] #*
-                        if 'Channel_Contact_Id' in headers:
-                            log['activity_log']['channel_contact_id_fk'] = headers['Channel-Contact-Id'] #*
-                        log['activity_log']['rel_id'] = query['email_queue']['id']
-                        log['activity_log']['section'] = headers['Section']
-                        log['activity_log']['description'] = headers['Description']
-                        log['activity_log']['description_complement'] = headers['Description-Complement']
-                        log['activity_log']['complementary_information'] = headers['Complementary-Information']
-                        log['activity_log']['model'] = ''
-                        log['activity_log']['function'] = 'endpoint_email_queues_post'
-                        log['activity_log']['result'] = 'Success' #* response 200
-                        log['activity_log']['response'] = json.dumps(data,default=formatter_datetime)
-                        log['activity_log']['json'] = json.dumps(query,default=formatter_datetime) #* request
-                        log['activity_log']['ip'] = request.remote_addr #*
-                        log['activity_log']['added_on'] = str(datetime.datetime.now()).split('.', maxsplit=1)[0]
-                        insert_activity_log(input_function=log)
+                        create_log(endpoint, 'email_queue', headers, data, query, ip= request.remote_addr)
                         return jsonify(data), 200
+                    
                     else:
                         data = {'message': '500 Internal Server Error - Error in connection or insert'}
-                        insert_file_log(function='endpoint_email_queues_post', \
-                            input_function=['request_json: ',request_json,'execute_query_response: ',execute_query_response['content']])
+                        insert_file_log(function=endpoint, input_function=['request_json: ',request_json,'execute_query_response: ',execute_query_response['content']])
                         return jsonify(data), 500
                 else:
-                    insert_file_log(function='endpoint_email_queues_post', \
-                        input_function=['request_json: ',request_json,'input_validation_errors: ',input_validation_errors])
+                    insert_file_log(function=endpoint, input_function=['request_json: ',request_json,'input_validation_errors: ',input_validation_errors])
                     return jsonify({"message": "500 Internal Server Error - Fields format error ("+input_validation_errors+")"}), 500
             else:
-                insert_file_log(function='endpoint_email_queues_post', \
-                    input_function=['headers: ',headers,'check_session_response: ',check_session_response['content']])
+                insert_file_log(function=endpoint, input_function=['headers: ',headers,'check_session_response: ',check_session_response['content']])
                 return jsonify({"message": "403 Forbidden - "+check_session_response['content']}), 403
         else:
-            insert_file_log(function='endpoint_email_queues_post', \
-                input_function=['headers: ',headers,'check_header_response: ',check_header_response['content']])
+            insert_file_log(function=endpoint, input_function=['headers: ',headers,'check_header_response: ',check_header_response['content']])
             return jsonify({"message": "403 Forbidden - "+check_header_response['content']}), 403
     #except Exception as e:
     #    exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -341,6 +296,7 @@ def endpoint_email_queues_post():
 def endpoint_email_queues_patch():
     """ doctest for endpoint_email_queues_patch (pendent try exception global of function) without unit test
     """
+    endpoint = 'endpoint_email_queues_patch'
     endpoint_response = {}
     endpoint_response['status'] = False
     endpoint_response['content'] = None
@@ -460,44 +416,23 @@ def endpoint_email_queues_patch():
                     #print('pos request_json',json.dumps(query,indent=4))
                     execute_query_response = execute_query_email_queues_patch(query=query['email_queue'], credentials=credentials)
                     if execute_query_response['status']:
-                        #data = {'message': 'Registro atualizado ('+query['email_queue']['id']+')'}
+                        
                         data = {'email_queue': {'id': query['email_queue']['id']}}
-                        log = {}
-                        log['activity_log'] = {}
-                        log['activity_log']['id'] = str(uuid.uuid4()).upper()
-                        if 'User-Id' in headers:
-                            log['activity_log']['user_id_fk'] = headers['User-Id'] #*
-                        if 'Channel_Contact_Id' in headers:
-                            log['activity_log']['channel_contact_id_fk'] = headers['Channel-Contact-Id'] #*
-                        log['activity_log']['rel_id'] = query['email_queue']['id']
-                        log['activity_log']['section'] = headers['Section']
-                        log['activity_log']['description'] = headers['Description']
-                        log['activity_log']['description_complement'] = headers['Description-Complement']
-                        log['activity_log']['complementary_information'] = headers['Complementary-Information']
-                        log['activity_log']['model'] = ''
-                        log['activity_log']['function'] = 'endpoint_email_queues_patch'
-                        log['activity_log']['result'] = 'Success' #* response
-                        log['activity_log']['json'] = json.dumps(query,default=formatter_datetime) #* request
-                        log['activity_log']['ip'] = request.remote_addr #*
-                        log['activity_log']['added_on'] = str(datetime.datetime.now()).split('.', maxsplit=1)[0]
-                        insert_activity_log(input_function=log)
+                        create_log(endpoint, 'email_queue', headers, data, query, ip= request.remote_addr)
                         return jsonify(data), 200
+                    
                     else:
                         data = {'message': '500 Internal Server Error - Error in connection or insert'}
-                        insert_file_log(function='endpoint_email_queues_patch', \
-                            input_function=['request_json: ',request_json,'execute_query_response: ',execute_query_response['content']])
+                        insert_file_log(function=endpoint, input_function=['request_json: ',request_json,'execute_query_response: ',execute_query_response['content']])
                         return jsonify(data), 500
                 else:
-                    insert_file_log(function='endpoint_email_queues_patch', \
-                        input_function=['request_json: ',request_json,'input_validation_errors: ',input_validation_errors])
+                    insert_file_log(function=endpoint, input_function=['request_json: ',request_json,'input_validation_errors: ',input_validation_errors])
                     return jsonify({"message": "500 Internal Server Error - Fields format error ("+input_validation_errors+")"}), 500
             else:
-                insert_file_log(function='endpoint_email_queues_patch', \
-                    input_function=['headers: ',headers,'check_session_response: ',check_session_response['content']])
+                insert_file_log(function=endpoint, input_function=['headers: ',headers,'check_session_response: ',check_session_response['content']])
                 return jsonify({"message": "403 Forbidden - "+check_session_response['content']}), 403
         else:
-            insert_file_log(function='endpoint_email_queues_patch', \
-                input_function=['headers: ',headers,'check_header_response: ',check_header_response['content']])
+            insert_file_log(function=endpoint, input_function=['headers: ',headers,'check_header_response: ',check_header_response['content']])
             return jsonify({"message": "403 Forbidden - "+check_header_response['content']}), 403
     #except Exception as e:
     #    exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -507,6 +442,7 @@ def endpoint_email_queues_patch():
 def endpoint_email_templates_get():
     """ doctest for endpoint_email_templates_get (pendent try exception global of function) without unit test
     """
+    endpoint = 'endpoint_email_templates_get'
     endpoint_response = {}
     endpoint_response['status'] = False
     endpoint_response['content'] = None
@@ -525,56 +461,31 @@ def endpoint_email_templates_get():
                         if execute_query_response['content'] or not request.args.get('id'):
                             if (len(execute_query_response['content']) == 1 and request.args.get('id')) or \
                                 (len(execute_query_response['content']) >= 0 and not request.args.get('id')):
+                                    
                                 data = execute_query_response['content']
-                                log = {}
-                                log['activity_log'] = {}
-                                log['activity_log']['id'] = str(uuid.uuid4()).upper()
-                                if 'User-Id' in headers:
-                                    log['activity_log']['user_id_fk'] = headers['User-Id'] #*
-                                if 'Channel_Contact_Id' in headers:
-                                    log['activity_log']['channel_contact_id_fk'] = headers['Channel-Contact-Id'] #*
-                                log['activity_log']['rel_id'] = None #*
-                                if (len(execute_query_response['content']) == 1 and request.args.get('id')):
-                                    log['activity_log']['rel_id'] = execute_query_response['content'][0]['email_template']['id']
-                                log['activity_log']['section'] = headers['Section']
-                                log['activity_log']['description'] = headers['Description']
-                                log['activity_log']['description_complement'] = headers['Description-Complement']
-                                log['activity_log']['complementary_information'] = headers['Complementary-Information']
-                                log['activity_log']['model'] = ''
-                                log['activity_log']['function'] = 'endpoint_email_templates_get'
-                                log['activity_log']['result'] = 'Success' #* response
-                                log['activity_log']['response'] = json.dumps(data,default=formatter_datetime)
-                                log['activity_log']['json'] = json.dumps(query,default=formatter_datetime) #* request
-                                log['activity_log']['ip'] = request.remote_addr #*
-                                log['activity_log']['added_on'] = str(datetime.datetime.now()).split('.', maxsplit=1)[0]
-                                insert_activity_log(input_function=log)
+                                create_log(endpoint, 'email_template', headers, data, query, ip= request.remote_addr)
                                 return jsonify(data), 200
+                            
                             else:
                                 data = {'message': '500 Internal Server Error - Not found uniq'}
-                                insert_file_log(function='endpoint_email_templates_get', \
-                                    input_function=['query: ',query,'execute_query_response: ',execute_query_response['content']])
+                                insert_file_log(function=endpoint, input_function=['query: ',query,'execute_query_response: ',execute_query_response['content']])
                                 return jsonify(data), 500
                         else:
                             data = {'message': '500 Internal Server Error - Not found'}
-                            insert_file_log(function='endpoint_email_templates_get', \
-                                input_function=['query: ',query,'execute_query_response: ',execute_query_response['content']])
+                            insert_file_log(function=endpoint, input_function=['query: ',query,'execute_query_response: ',execute_query_response['content']])
                             return jsonify(data), 500
                     else:
                         data = {'message': '500 Internal Server Error - Error in connection or insert'}
-                        insert_file_log(function='endpoint_email_templates_get', \
-                            input_function=['query: ',query,'execute_query_response: ',execute_query_response['content']])
+                        insert_file_log(function=endpoint, input_function=['query: ',query,'execute_query_response: ',execute_query_response['content']])
                         return jsonify(data), 500
                 else:
-                    insert_file_log(function='endpoint_email_templates_get', \
-                        input_function=['query: ',query,'input_validation_errors: ',input_validation_errors])
+                    insert_file_log(function=endpoint, input_function=['query: ',query,'input_validation_errors: ',input_validation_errors])
                     return jsonify({"message": "500 Internal Server Error - Fields format error ("+str(input_validation_errors)+")"}), 500
             else:
-                insert_file_log(function='endpoint_email_templates_get', \
-                    input_function=['headers: ',headers,'check_session_response: ',check_session_response['content']])
+                insert_file_log(function=endpoint, input_function=['headers: ',headers,'check_session_response: ',check_session_response['content']])
                 return jsonify({"message": "403 Forbidden - "+check_session_response['content']}), 403
         else:
-            insert_file_log(function='endpoint_email_templates_get', \
-                input_function=['headers: ',headers,'check_header_response: ',check_header_response['content']])
+            insert_file_log(function=endpoint, input_function=['headers: ',headers,'check_header_response: ',check_header_response['content']])
             return jsonify({"message": "403 Forbidden - "+check_header_response['content']}), 403
     #except Exception as e:
     #    exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -584,6 +495,7 @@ def endpoint_email_templates_get():
 def endpoint_email_templates_post():
     """ doctest for endpoint_email_templates_post (pendent try exception global of function) without unit test
     """
+    endpoint = 'endpoint_email_templates_post'
     endpoint_response = {}
     endpoint_response['status'] = False
     endpoint_response['content'] = None
@@ -659,56 +571,28 @@ def endpoint_email_templates_post():
                     input_validation_errors += check_field_result['content']
                 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
                 query['email_template']['added_on'] = str(datetime.datetime.now()).split('.', maxsplit=1)[0]
-                #field = ['email_template','added_on']
-                #check_field_result = check_field(input_function=copy.deepcopy(request_json),field=field,type='timestamp',default=str(datetime.datetime.now()).split('.', maxsplit=1)[0],optional=False)
-                #if check_field_result['status']:
-                #    query = check_field_result['content']
-                #else:
-                #    input_validation_errors += check_field_result['content']
                 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
                 if not input_validation_errors:
                     #print('pos request_json',json.dumps(query,indent=4))
                     execute_query_response = execute_query_email_templates_post(query=query['email_template'], credentials=credentials)
                     if execute_query_response['status']:
-                        #data = {'message': 'Registro inserido ('+query['email_template']['id']+')'}
+                        
                         data = {'email_template': {'id': query['email_template']['id']}}
-                        log = {}
-                        log['activity_log'] = {}
-                        log['activity_log']['id'] = str(uuid.uuid4()).upper()
-                        if 'User-Id' in headers:
-                            log['activity_log']['user_id_fk'] = headers['User-Id'] #*
-                        if 'Channel_Contact_Id' in headers:
-                            log['activity_log']['channel_contact_id_fk'] = headers['Channel-Contact-Id'] #*
-                        log['activity_log']['rel_id'] = query['email_template']['id']
-                        log['activity_log']['section'] = headers['Section']
-                        log['activity_log']['description'] = headers['Description']
-                        log['activity_log']['description_complement'] = headers['Description-Complement']
-                        log['activity_log']['complementary_information'] = headers['Complementary-Information']
-                        log['activity_log']['model'] = ''
-                        log['activity_log']['function'] = 'endpoint_email_templates_post'
-                        log['activity_log']['result'] = 'Success' #* response 200
-                        log['activity_log']['response'] = json.dumps(data,default=formatter_datetime)
-                        log['activity_log']['json'] = json.dumps(query,default=formatter_datetime) #* request
-                        log['activity_log']['ip'] = request.remote_addr #*
-                        log['activity_log']['added_on'] = str(datetime.datetime.now()).split('.', maxsplit=1)[0]
-                        insert_activity_log(input_function=log)
+                        create_log(endpoint, 'email_template', headers, data, query, ip= request.remote_addr)
                         return jsonify(data), 200
+                    
                     else:
                         data = {'message': '500 Internal Server Error - Error in connection or insert'}
-                        insert_file_log(function='endpoint_email_templates_post', \
-                            input_function=['request_json: ',request_json,'execute_query_response: ',execute_query_response['content']])
+                        insert_file_log(function=endpoint, input_function=['request_json: ',request_json,'execute_query_response: ',execute_query_response['content']])
                         return jsonify(data), 500
                 else:
-                    insert_file_log(function='endpoint_email_templates_post', \
-                        input_function=['request_json: ',request_json,'input_validation_errors: ',input_validation_errors])
+                    insert_file_log(function=endpoint, input_function=['request_json: ',request_json,'input_validation_errors: ',input_validation_errors])
                     return jsonify({"message": "500 Internal Server Error - Fields format error ("+input_validation_errors+")"}), 500
             else:
-                insert_file_log(function='endpoint_email_templates_post', \
-                    input_function=['headers: ',headers,'check_session_response: ',check_session_response['content']])
+                insert_file_log(function=endpoint, input_function=['headers: ',headers,'check_session_response: ',check_session_response['content']])
                 return jsonify({"message": "403 Forbidden - "+check_session_response['content']}), 403
         else:
-            insert_file_log(function='endpoint_email_templates_post', \
-                input_function=['headers: ',headers,'check_header_response: ',check_header_response['content']])
+            insert_file_log(function=endpoint, input_function=['headers: ',headers,'check_header_response: ',check_header_response['content']])
             return jsonify({"message": "403 Forbidden - "+check_header_response['content']}), 403
     #except Exception as e:
     #    exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -718,6 +602,7 @@ def endpoint_email_templates_post():
 def endpoint_email_templates_patch():
     """ doctest for endpoint_email_templates_patch (pendent try exception global of function) without unit test
     """
+    endpoint = 'endpoint_email_templates_patch'
     endpoint_response = {}
     endpoint_response['status'] = False
     endpoint_response['content'] = None
@@ -795,44 +680,23 @@ def endpoint_email_templates_patch():
                     #print('pos request_json',json.dumps(query,indent=4))
                     execute_query_response = execute_query_email_templates_patch(query=query['email_template'], credentials=credentials)
                     if execute_query_response['status']:
-                        #data = {'message': 'Registro atualizado ('+query['email_template']['id']+')'}
+                        
                         data = {'email_template': {'id': query['email_template']['id']}}
-                        log = {}
-                        log['activity_log'] = {}
-                        log['activity_log']['id'] = str(uuid.uuid4()).upper()
-                        if 'User-Id' in headers:
-                            log['activity_log']['user_id_fk'] = headers['User-Id'] #*
-                        if 'Channel_Contact_Id' in headers:
-                            log['activity_log']['channel_contact_id_fk'] = headers['Channel-Contact-Id'] #*
-                        log['activity_log']['rel_id'] = query['email_template']['id']
-                        log['activity_log']['section'] = headers['Section']
-                        log['activity_log']['description'] = headers['Description']
-                        log['activity_log']['description_complement'] = headers['Description-Complement']
-                        log['activity_log']['complementary_information'] = headers['Complementary-Information']
-                        log['activity_log']['model'] = ''
-                        log['activity_log']['function'] = 'endpoint_email_templates_patch'
-                        log['activity_log']['result'] = 'Success' #* response
-                        log['activity_log']['json'] = json.dumps(query,default=formatter_datetime) #* request
-                        log['activity_log']['ip'] = request.remote_addr #*
-                        log['activity_log']['added_on'] = str(datetime.datetime.now()).split('.', maxsplit=1)[0]
-                        insert_activity_log(input_function=log)
+                        create_log(endpoint, 'email_template', headers, data, query, ip= request.remote_addr)
                         return jsonify(data), 200
+                    
                     else:
                         data = {'message': '500 Internal Server Error - Error in connection or insert'}
-                        insert_file_log(function='endpoint_email_templates_patch', \
-                            input_function=['request_json: ',request_json,'execute_query_response: ',execute_query_response['content']])
+                        insert_file_log(function=endpoint, input_function=['request_json: ',request_json,'execute_query_response: ',execute_query_response['content']])
                         return jsonify(data), 500
                 else:
-                    insert_file_log(function='endpoint_email_templates_patch', \
-                        input_function=['request_json: ',request_json,'input_validation_errors: ',input_validation_errors])
+                    insert_file_log(function=endpoint, input_function=['request_json: ',request_json,'input_validation_errors: ',input_validation_errors])
                     return jsonify({"message": "500 Internal Server Error - Fields format error ("+input_validation_errors+")"}), 500
             else:
-                insert_file_log(function='endpoint_email_templates_patch', \
-                    input_function=['headers: ',headers,'check_session_response: ',check_session_response['content']])
+                insert_file_log(function=endpoint, input_function=['headers: ',headers,'check_session_response: ',check_session_response['content']])
                 return jsonify({"message": "403 Forbidden - "+check_session_response['content']}), 403
         else:
-            insert_file_log(function='endpoint_email_templates_patch', \
-                input_function=['headers: ',headers,'check_header_response: ',check_header_response['content']])
+            insert_file_log(function=endpoint, input_function=['headers: ',headers,'check_header_response: ',check_header_response['content']])
             return jsonify({"message": "403 Forbidden - "+check_header_response['content']}), 403
     #except Exception as e:
     #    exc_type, exc_obj, exc_tb = sys.exc_info()
