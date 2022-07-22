@@ -8,7 +8,6 @@
 * Nginx
 * Docker com Dockerfile e docker-compose.yml
 * Frontend em React
-* Honeypot
 
 ## Este sistema não possúi:
 
