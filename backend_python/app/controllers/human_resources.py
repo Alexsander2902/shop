@@ -51,7 +51,7 @@ def endpoint_genders_get():
         check_header_response = check_header(header=headers,key=key)
         if check_header_response['status']:
             check_session_response = check_session(header=headers)
-            if check_session_response['status']:
+            if check_session_response['status']: 
                 input_validation_errors = not check_uuid(request.args.get('id'))
                 query = {"response_type": request.args.get('response_type'), "id": request.args.get('id'), "search": request.args.get('search'), "order_column_1": request.args.get('order_column_1'), "order_direction_column_1": request.args.get('order_direction_column_1'), "limit": request.args.get('limit')}
                 if not input_validation_errors:
