@@ -19,7 +19,7 @@ def create_log(endpoint:str, table, headers, data, query, ip):
     
     method = endpoint.split("_")[-1]
     if method == 'get':
-        activity_log = data[0][table]['id'] if(len(data) == 1 and 'id') in query else None
+        activity_log = data[0][table]['id'] if len(data) == 1 and 'id' in query else None
     
     log = {}
     log['activity_log'] = {}
